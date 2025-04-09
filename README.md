@@ -24,11 +24,13 @@ I ran these on an NVIDIA GTX 1650
 
 ### Finding the End of a Linked List:
 
-  Here are a couple plots I took of the same run. I tried iterating through in one pass but it became highly ineffient compared to one-pass, so this is all there is. `Custom` is the implementation on the CPU with tensors, and the number in `Triton <number>` represents the block_size.
+  Here are a couple plots I took of the same run. I was going to take an average but I think the GPU started throttling. 
+  
+  `Custom` is the implementation on the CPU with tensors, and the number in `Triton <number>` represents the block_size.
   ![Finding the End of a Linked List results](images/benchmarks/fast_eof_ll/Finding%20the%20End%20of%20a%20Linked%20List%20Performance(1).png)
   ![Finding the End of a Linked List results](images/benchmarks/fast_eof_ll/Finding%20the%20End%20of%20a%20Linked%20List%20Performance(2).png)
 
-  To simulate a more realistic linked list structure, for benchmarks I randomized the node order using `torch.randperm(n)`. This removes spatial locality and forces the CPU to load scattered memory addresses. If the links were adjacent, the CPU throughput in GB/s would plateau, but here, randomness results in significantly worse performance.
+  To simulate a more realistic linked list structure, for benchmarks I randomized the node order using `torch.randperm(n)`. This removes spatial locality and forces the scattered memory addresses. If the links were adjacent, the CPU throughput in GB/s would plateau, but here, randomness results in significantly worse performance.
 
 ### CPU Behavior
   Each node in the linked list is an `int32` (4 bytes). Most CPUs have 64-byte cache lines, which means 16 such elements can fit in one line.
@@ -37,11 +39,13 @@ I ran these on an NVIDIA GTX 1650
 
   Assuming 64-byte cache lines, the number of cache misses scales linearly with the size of the list. You can express this as:
 
-  $2^{k}$, where $k=max(0, \beta-6)$ and $\beta=log_{2}(4n)$
-
-  This expression is equivalent to:
-
   $\lceil\frac{n}{16}\rceil$
+
+  This expression is also equivalent to:
+
+  $2^{k}$, where $k=max(0, \beta-6)$ and $\beta=log_{2}(4n)$. 
+  
+  - Note that $k$ corresponds to the number of bits needed to index cache lines&mdash;and this number is finite. With set-associative caches, only a subset of these bits is used for selecting a cache set. This can cause thrasing.
   
   For example:
 
@@ -52,7 +56,7 @@ I ran these on an NVIDIA GTX 1650
   As the working set exceeds the capacity of L1, L2, etc., the CPU must evict older lines to load new ones. This leads to cache thrashing&mdash;when each access evicts data that may be needed again soon. This creates a "round-robin" effect where the cache cycles through lines too quickly to reuse them efficiently. With 64-byte lines and 4-byte nodes, the CPU may cycle through ~15 cache lines before revisiting a previously evicted one.
 
   ### GPU Behavior
-  On the GPU, the SIMT execution model used with the algorithm qis advantageous because of the number of threads available. 
+  On the GPU, the SIMT execution model used with the algorithm is advantageous because of the number of threads available. 
   
   In the ideal case, the number of iterations to reach the end of the list is:
 
