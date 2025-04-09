@@ -1,5 +1,5 @@
 # GPU Algorithms Examples
-Normally I would do this in C++. I stumbled across OpenAI Triton on the GPU-Mode discord. 
+Normally I would do this in C++. I stumbled across OpenAI Triton on the GPU MODE discord. 
 Curious about it, I thought this would be a good time to try it out.
 
 The Triton compiler does automatic optimizations that usually a CUDA programmer would do by hand. So I decided to write these algorithms in Triton to learn more about it. I will not test Triton, but instead test the runtime of the parallel algorithms with their single-threaded counterpart on the CPU. 
