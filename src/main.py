@@ -26,6 +26,13 @@ EXAMPLE_PROGRAMS = {
 }
 
 # kernels
+
+########## ########## ########## ########## ########## ########## ########## ##########
+########## # For convenience I left the "hello world" tutorial code here.  # ##########
+########## ########## ########## ########## ########## ########## ########## ##########
+
+# This kernel is from the triton getting-started tutorials. Source:
+# https://triton-lang.org/main/getting-started/tutorials/01-vector-add.html#sphx-glr-getting-started-tutorials-01-vector-add-py
 @triton.jit
 def add_kernel(x_ptr,  # *Pointer* to first input vector.
                 y_ptr,  # *Pointer* to second input vector.
