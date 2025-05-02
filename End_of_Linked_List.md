@@ -1,5 +1,6 @@
 # Finding the End of a Linked List:
-- **Technique:** Pointer-Jumping
+**Technique:** Pointer-Jumping!
+
   Here are a couple plots I took of the same run. I was going to take an average but I think the GPU started throttling. 
   
   `Custom` is the implementation on the CPU with tensors, and the number in `Triton <number>` represents the block_size.
